@@ -54,7 +54,6 @@ function Write-LogFile
         Write-Host $logLine
     }
 }
-
 function ConnectExchange
 {
     # Check if a connection to an exchange server exists and connect if necessary...
@@ -63,7 +62,7 @@ function ConnectExchange
         $LogPrefix = "ConnectExchange"
 
         # Test if Exchange Management Shell Module is installed - if not, exit the script
-        $EMSModuleFile = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\ExchangeServer\v15\Setup).MsiInstallPath + "bin\RemoteExchange.ps1"
+        $EMSModuleFile = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\ExchangeServer\v15\Setup -ErrorAction SilentlyContinue).MsiInstallPath + "bin\RemoteExchange.ps1"
         
         # If the EMS Module wasn't found
         if (-Not (Test-Path $EMSModuleFile))
@@ -71,36 +70,40 @@ function ConnectExchange
             # Write Error end exit the script
             $ErrorMessage = "Exchange Management Shell Module not found on this computer. Please run this script on a computer with Exchange Management Tools installed!"
             Write-LogFile -LogPrefix $LogPrefix -Message $ErrorMessage
-            Write-Host -ForegroundColor Red -Message $ErrorMessage
             Exit
         }
 
-        # Load Exchange Management Shell
-        try
+        else
         {
-            . $($EMSModuleFile) -ErrorAction Stop | Out-Null
-            Write-LogFile -LogPrefix $LogPrefix -Message "Successfully loaded Exchange Management Shell Module."
-        }
+            # Load Exchange Management Shell
+            try
+            {
+                # Dot source the EMS Script
+                . $($EMSModuleFile) -ErrorAction Stop | Out-Null
+                Write-LogFile -LogPrefix $LogPrefix -Message "Successfully loaded Exchange Management Shell Module."
+            }
 
-        catch
-        {
-            Write-LogFile -LogPrefix $LogPrefix -Message "Unable to load Exchange Management Shell Module." -ErrorInfo $_
-        }
+            catch
+            {
+                Write-LogFile -LogPrefix $LogPrefix -Message "Unable to load Exchange Management Shell Module." -ErrorInfo $_
+                Exit
+            }
 
-        # Connect to Exchange Server
-        try
-        {
-            Connect-ExchangeServer -auto -ClientApplication:ManagementShell -ErrorAction Stop | Out-Null
-            Write-LogFile -LogPrefix $LogPrefix -Message "Successfully connected to Exchange Server."
-        }
+            # Connect to Exchange Server
+            try
+            {
+                Connect-ExchangeServer -auto -ClientApplication:ManagementShell -ErrorAction Stop | Out-Null
+                Write-LogFile -LogPrefix $LogPrefix -Message "Successfully connected to Exchange Server."
+            }
 
-        catch
-        {
-            Write-LogFile -LogPrefix $LogPrefix -Message "Unable to connect to Exchange Server." -ErrorInfo $_
+            catch
+            {
+                Write-LogFile -LogPrefix $LogPrefix -Message "Unable to connect to Exchange Server." -ErrorInfo $_
+                Exit
+            }
         }
     }
 }
-
 function Get-ExchangeServers
 {
     try
@@ -117,7 +120,6 @@ function Get-ExchangeServers
 
     Return $ExchangeServers
 }
-
 function Get-CommonExchangeServerCertificates
 {
     [CmdletBinding()]
@@ -202,7 +204,6 @@ function Get-CommonExchangeServerCertificates
 
     Return $CommonCertificates
 }
-
 Function Get-CertificateString
 {
     [CmdletBinding()]
@@ -236,7 +237,6 @@ Function Get-CertificateString
         Write-LogFile -Message "Successfully Built TLSCertname String '$($TLSCertName)'"
     }
 }
-
 function Set-HybridCertificate
 {
     [CmdletBinding()]
@@ -350,7 +350,6 @@ function Set-HybridCertificate
 
     Return $SetHybridCertificateStatus
 }
-
 #region XAML
 #Form Start
 
