@@ -261,8 +261,9 @@ function Set-HybridCertificate
         {
             Write-LogFile -Message "Loading properties of Receive Connector 'Default Frontend' from server $($Servers)"
             $RcvConnector = Get-ReceiveConnector -Server $Server | Where-Object Identity -Like "*Default Frontend*" -ErrorAction Stop
-            Write-LogFile -Message "Loading properties of Receive Connector 'Default Frontend'"
+            Write-LogFile -Message "Successfully loaded properties of Receive Connector 'Default Frontend'"
         }
+        
         catch
         {
             Write-LogFile -Message "Failed to load properties of Receive Connector 'Default Frontend' from server $($Server)" -ErrorInfo $_
