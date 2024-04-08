@@ -171,7 +171,7 @@ function Get-CommonExchangeServerCertificates
 
     elseif ($ExchangeServers.Count -eq 1)
     {
-        Write-LogFile -Message "Finding common certificates across Exchange Servers"
+        Write-LogFile -Message "Finding common certificates for one Exchange Server"
         $CommonCertificates = $AllCerts
 
         if ($CommonCertificates -gt 0)
@@ -187,7 +187,7 @@ function Get-CommonExchangeServerCertificates
 
     else
     {
-        Write-LogFile -Message "Finding common certificates across Exchange Servers"
+        Write-LogFile -Message "Finding common certificates across $($ExchangeServers.Count) Exchange Servers"
 
         $CommonCertificates = $AllCerts | Group-Object | Where-Object { $_.Count -gt 1 } | Select-Object -ExpandProperty Name
 
@@ -470,7 +470,7 @@ $Button_Retrieve_Certificates.Add_Click(
 
 $Button_Replace_Certificate.Add_Click(
     {
-        $SelectedCertificateThumbprint = $Combobox_Certificate_Selection.SelectedItem.ToString().Split(",")[2]
+        $SelectedCertificateThumbprint = $Combobox_Certificate_Selection.SelectedItem.ToString().Split(",")[-1]
         
         $SelectedConnector = $Combobox_SendConnector_Selection.SelectedItem
         
